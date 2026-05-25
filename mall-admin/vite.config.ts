@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
-  base: process.env.GITHUB_ACTIONS ? '/ecommerce-platform/' : '/',
+  base: process.env.GITHUB_ACTIONS ? '/ecommerce-platform/admin/' : '/',
   server: {
     port: 5173,
     proxy: {

@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "title": "示例商品 · 高品质电商演示",
+    "subTitle": "开源 Spring Boot + Vue3 + uni-app 全栈",
+    "status": 1
+  },
+  {
+    "id": 2,
+    "title": "在线演示模式",
+    "subTitle": "GitHub Pages 静态部署 · 可对接公网 API",
+    "status": 1
+  }
+]

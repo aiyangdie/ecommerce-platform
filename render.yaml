@@ -1,0 +1,20 @@
+# Render.com 一键部署后端（可选，需另配云 MySQL）
+# Dashboard → New → Web Service → Docker → Dockerfile: docker/Dockerfile.api
+services:
+  - type: web
+    name: mall-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./docker/Dockerfile.api
+    dockerContext: .
+    envVars:
+      - key: MYSQL_HOST
+        sync: false
+      - key: MYSQL_DATABASE
+        value: mall
+      - key: MYSQL_USER
+        sync: false
+      - key: MYSQL_PASSWORD
+        sync: false
+      - key: REDIS_HOST
+        sync: false

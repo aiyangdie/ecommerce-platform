@@ -65,15 +65,22 @@ npm run dev
 
 更完整步骤见 **[docs/SETUP.md](docs/SETUP.md)**。
 
-## 在线演示（GitHub）
+## 在线演示（GitHub Pages）
+
+| 页面 | 地址 |
+|------|------|
+| **门户首页** | https://aiyangdie.github.io/ecommerce-platform/ |
+| **管理后台演示** | https://aiyangdie.github.io/ecommerce-platform/admin/ |
+
+首次启用请在仓库 **Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**，然后到 **Actions** 运行 **Deploy Online (GitHub Pages)**（推送 `main` 会自动触发）。
 
 | 组件 | 部署方式 |
 |------|----------|
-| **管理后台** | GitHub Actions → **GitHub Pages**（静态站点） |
-| **后端 API** | 需云主机 / Railway / Render 等（见 [docs/DEPLOY.md](docs/DEPLOY.md)） |
-| **MySQL / Redis** | 云数据库或 Docker 服务器，不与前端同仓构建 |
+| **门户 + 管理端** | GitHub Actions → Pages（含在线演示数据） |
+| **后端 API** | 云主机 / Railway / Render（见 [docs/DEPLOY.md](docs/DEPLOY.md)） |
+| **MySQL / Redis** | Docker 或云数据库 |
 
-> GitHub Pages 仅托管静态前端；数据库与 Java 后端需在服务器或 PaaS 单独部署，符合生产级前后端分离实践。
+> 私有仓库需 GitHub Pro 才能用 Pages；**建议改为 Public** 以便他人访问在线演示。
 
 ## 文档
 

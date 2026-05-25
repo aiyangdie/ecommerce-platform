@@ -1,4 +1,4 @@
-name: Deploy Admin to GitHub Pages
+name: Deploy Online (GitHub Pages)
 
 on:
   push:
@@ -22,21 +22,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Build admin for GitHub Pages
+
+      - name: Build mall-admin (online demo mode)
         working-directory: mall-admin
         env:
           GITHUB_ACTIONS: true
-          # 演示 API：部署后可在仓库 Variables 覆盖
+          VITE_DEMO_MODE: 'true'
           VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || '' }}
         run: |
           npm install
           npm run build
+
+      - name: Assemble site (landing + admin)
+        run: |
+          mkdir -p _site/admin
+          cp -r docs/index.html docs/.nojekyll _site/
+          cp -r mall-admin/dist/* _site/admin/
+
       - uses: actions/configure-pages@v5
+
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: mall-admin/dist
+          path: _site
+
       - id: deployment
         uses: actions/deploy-pages@v4
