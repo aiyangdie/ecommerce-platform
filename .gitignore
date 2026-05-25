@@ -1,0 +1,37 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+.DS_Store
+
+# Java
+target/
+*.class
+*.jar
+*.war
+*.log
+hs_err_pid*
+
+# Node / Frontend
+node_modules/
+dist/
+unpackage/
+.hbuilderx/
+*.local
+
+# Env & secrets — 切勿提交
+.env
+.env.*
+!.env.example
+application-local.yml
+application-local.properties
+
+# OS
+Thumbs.db
+
+# Docker volumes
+docker/data/
+
+# uni-app
+mall-uni/node_modules/
