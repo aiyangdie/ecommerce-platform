@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "orderNo": "DEMO202605260001",
+    "status": 20,
+    "payAmount": 199,
+    "receiverName": "演示用户",
+    "items": [{ "skuName": "无线蓝牙耳机 Pro-黑色", "quantity": 1, "price": 199 }]
+  },
+  {
+    "id": 2,
+    "orderNo": "DEMO202605260002",
+    "status": 30,
+    "payAmount": 89,
+    "receiverName": "演示用户",
+    "items": [{ "skuName": "便携咖啡杯-350ml", "quantity": 1, "price": 89 }]
+  }
+]

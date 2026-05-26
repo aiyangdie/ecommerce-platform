@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import http from '../api/http'
+import http, { demoGet, isDemoMode } from '../api/http'
 import { ElMessage } from 'element-plus'
 
 interface Product {
@@ -24,9 +24,15 @@ const form = ref({
   skus: [{ skuName: '默认', price: 99, stock: 100 }],
 })
 
+const readOnly = isDemoMode || (() => localStorage.getItem('admin_token') === 'demo')()
+
 async function load() {
   loading.value = true
   try {
+    if (readOnly) {
+      list.value = await demoGet<Product[]>('products.json')
+      return
+    }
     const res = await http.get('/api/v1/admin/products')
     list.value = res.data.data
   } finally {
@@ -35,6 +41,10 @@ async function load() {
 }
 
 function openCreate() {
+  if (readOnly) {
+    ElMessage.warning('演示模式不可新增，请使用 Docker 完整版')
+    return
+  }
   form.value = { id: null, title: '', subTitle: '', coverUrl: '', status: 1, skus: [{ skuName: '默认', price: 99, stock: 100 }] }
   dialog.value = true
 }
@@ -47,6 +57,10 @@ async function save() {
 }
 
 async function toggleStatus(row: Product) {
+  if (readOnly) {
+    ElMessage.warning('演示模式不可修改')
+    return
+  }
   const status = row.status === 1 ? 0 : 1
   await http.put(`/api/v1/admin/products/${row.id}/status`, { status })
   ElMessage.success('已更新')
@@ -62,6 +76,7 @@ onMounted(load)
       <h2>商品管理</h2>
       <el-button type="primary" @click="openCreate">新增商品</el-button>
     </div>
+    <el-alert v-if="readOnly" title="演示数据（只读）" type="warning" show-icon :closable="false" style="margin-bottom:12px" />
     <el-table :data="list" v-loading="loading" stripe>
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column prop="title" label="标题" />
