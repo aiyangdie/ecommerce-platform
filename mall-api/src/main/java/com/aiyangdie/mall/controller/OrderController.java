@@ -36,6 +36,17 @@ public class OrderController {
         return Result.ok(orderService.listMyOrders());
     }
 
+    @GetMapping("/{orderNo}")
+    public Result<OrderVo> detail(@PathVariable String orderNo) {
+        return Result.ok(orderService.detail(orderNo));
+    }
+
+    @PostMapping("/{orderNo}/cancel")
+    public Result<Void> cancel(@PathVariable String orderNo) {
+        orderService.cancel(orderNo);
+        return Result.ok(null);
+    }
+
     @PostMapping("/{orderNo}/pay")
     public Result<Void> pay(@PathVariable String orderNo) {
         orderService.pay(orderNo);

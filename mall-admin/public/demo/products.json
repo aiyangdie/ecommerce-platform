@@ -4,7 +4,9 @@
     "title": "无线蓝牙耳机 Pro",
     "subTitle": "降噪长续航 · 开源电商演示",
     "coverUrl": "https://picsum.photos/seed/earphone/400/400",
-    "status": 1
+    "status": 1,
+    "minPrice": 199,
+    "skus": [{ "skuName": "黑色", "price": 199, "stock": 100 }]
   },
   {
     "id": 2,

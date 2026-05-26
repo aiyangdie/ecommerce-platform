@@ -14,5 +14,6 @@ public class OrderVo {
     private String receiverName;
     private String receiverPhone;
     private String receiverAddr;
+    private String createdAt;
     private List<OrderItemVo> items;
 }

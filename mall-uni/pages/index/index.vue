@@ -4,8 +4,9 @@
       <text class="title">高品质商城</text>
       <text class="sub">开源 Spring Boot + uni-app</text>
     </view>
+    <input class="search" v-model="keyword" placeholder="搜索商品" @confirm="load" />
     <view v-if="loading" class="tip">加载中…</view>
-    <view v-for="p in products" :key="p.id" class="card">
+    <view v-for="p in products" :key="p.id" class="card" @click="goDetail(p.id)">
       <image class="cover" :src="p.coverUrl || defaultImg" mode="aspectFill" />
       <view class="info">
         <text class="name">{{ p.title }}</text>
@@ -24,13 +25,16 @@
 import { request } from '../../utils/api.js'
 export default {
   data() {
-    return { products: [], loading: true, defaultImg: 'https://picsum.photos/200' }
+    return { products: [], loading: true, keyword: '', defaultImg: 'https://picsum.photos/200' }
   },
   onShow() { this.load() },
   methods: {
     async load() {
       this.loading = true
-      try { this.products = await request('/products') }
+      try {
+        const q = this.keyword ? '?keyword=' + encodeURIComponent(this.keyword) : ''
+        this.products = await request('/products' + q)
+      }
       catch (e) { uni.showToast({ title: e.message || '加载失败', icon: 'none' }) }
       finally { this.loading = false }
     },
@@ -41,6 +45,9 @@ export default {
         return true
       }
       return false
+    },
+    goDetail(id) {
+      uni.navigateTo({ url: '/pages/detail/detail?id=' + id })
     },
     async addCart(skuId) {
       if (this.needLogin()) return
@@ -75,4 +82,5 @@ export default {
 .price { color: #ff6b35; font-weight: 700; font-size: 32rpx; }
 .actions { margin-top: 12rpx; display: flex; gap: 12rpx; }
 .tip { text-align: center; color: #999; padding: 40rpx; }
+.search { background: #fff; padding: 16rpx; border-radius: 8rpx; margin-bottom: 16rpx; width: 100%; }
 </style>

@@ -8,11 +8,13 @@ export function getToken() {
 }
 
 export function request(path, options = {}) {
+  const method = options.method || 'GET'
   return new Promise((resolve, reject) => {
     uni.request({
       url: API_BASE + path,
+      method,
       method: options.method || 'GET',
-      data: options.data,
+      data: options.data || options.body,
       header: {
         'Content-Type': 'application/json',
         Authorization: getToken() ? 'Bearer ' + getToken() : '',

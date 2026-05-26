@@ -20,8 +20,8 @@ public class ProductController {
 
     @Operation(summary = "上架商品列表")
     @GetMapping
-    public Result<List<ProductVo>> list() {
-        return Result.ok(productService.listOnSale());
+    public Result<List<ProductVo>> list(@RequestParam(required = false) String keyword) {
+        return Result.ok(productService.listOnSale(keyword));
     }
 
     @Operation(summary = "商品详情")

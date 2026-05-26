@@ -6,8 +6,11 @@
       <text class="status">{{ statusMap[o.status] }}</text>
       <text class="items">{{ formatItems(o.items) }}</text>
       <text class="price">¥{{ o.payAmount }}</text>
-      <button v-if="o.status===10" size="mini" type="primary" @click="pay(o.orderNo)">支付</button>
-      <button v-if="o.status===30" size="mini" @click="confirm(o.orderNo)">确认收货</button>
+      <view class="btns">
+        <button v-if="o.status===10" size="mini" type="primary" @click="pay(o.orderNo)">支付</button>
+        <button v-if="o.status===10" size="mini" @click="cancel(o.orderNo)">取消</button>
+        <button v-if="o.status===30" size="mini" @click="confirm(o.orderNo)">确认收货</button>
+      </view>
     </view>
   </view>
 </template>
@@ -37,6 +40,11 @@ export default {
     async confirm(no) {
       await request('/orders/' + no + '/confirm', { method: 'POST' })
       this.load()
+    },
+    async cancel(no) {
+      await request('/orders/' + no + '/cancel', { method: 'POST' })
+      uni.showToast({ title: '已取消' })
+      this.load()
     }
   }
 }
@@ -49,5 +57,6 @@ export default {
 .status { color: #ff6b35; font-size: 24rpx; }
 .items { color: #666; font-size: 24rpx; display: block; margin: 8rpx 0; }
 .price { font-weight: 700; display: block; margin-bottom: 8rpx; }
+.btns { display: flex; gap: 12rpx; margin-top: 8rpx; flex-wrap: wrap; }
 .empty { text-align: center; color: #999; padding: 80rpx; }
 </style>

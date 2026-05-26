@@ -24,8 +24,15 @@ public class ProductService {
     private final ProductSkuMapper skuMapper;
 
     public List<ProductVo> listOnSale() {
-        List<ProductSpu> spus = spuMapper.selectList(new LambdaQueryWrapper<ProductSpu>().eq(ProductSpu::getStatus, 1));
-        return spus.stream().map(this::toVo).collect(Collectors.toList());
+        return listOnSale(null);
+    }
+
+    public List<ProductVo> listOnSale(String keyword) {
+        LambdaQueryWrapper<ProductSpu> q = new LambdaQueryWrapper<ProductSpu>().eq(ProductSpu::getStatus, 1);
+        if (keyword != null && !keyword.isBlank()) {
+            q.and(w -> w.like(ProductSpu::getTitle, keyword).or().like(ProductSpu::getSubTitle, keyword));
+        }
+        return spuMapper.selectList(q).stream().map(this::toVo).collect(Collectors.toList());
     }
 
     public List<ProductVo> listAll() {

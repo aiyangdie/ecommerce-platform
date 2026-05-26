@@ -2,26 +2,32 @@
 import { onMounted, ref } from 'vue'
 import http, { demoGet, isDemoModeActive } from '../api/http'
 
-const stats = ref({ products: 0, orders: 0, api: '检测中' })
+interface Stats {
+  productCount: number
+  onSaleCount: number
+  orderCount: number
+  pendingPayCount: number
+  pendingShipCount: number
+  totalGmv: number
+}
+
+const stats = ref<Stats | null>(null)
+const apiStatus = ref('检测中')
+const demo = isDemoModeActive()
 
 onMounted(async () => {
-  if (isDemoModeActive()) {
-    stats.value.api = '演示模式'
-    const products = await demoGet<unknown[]>('products.json')
-    const orders = await demoGet<unknown[]>('orders.json')
-    stats.value.products = products.length
-    stats.value.orders = orders.length
+  if (demo) {
+    apiStatus.value = '在线演示'
+    stats.value = await demoGet<Stats>('stats.json')
     return
   }
   try {
     await http.get('/api/health')
-    stats.value.api = '正常'
-    const p = await http.get('/api/v1/admin/products')
-    stats.value.products = p.data.data?.length ?? 0
-    const o = await http.get('/api/v1/admin/orders')
-    stats.value.orders = o.data.data?.length ?? 0
+    apiStatus.value = '正常'
+    const res = await http.get('/api/v1/admin/stats')
+    stats.value = res.data.data
   } catch {
-    stats.value.api = '未连接（请启动 Docker / mall-api）'
+    apiStatus.value = '未连接'
   }
 })
 </script>
@@ -29,17 +35,38 @@ onMounted(async () => {
 <template>
   <div>
     <h2>运营概览</h2>
-    <el-row :gutter="16">
-      <el-col :span="8"><el-statistic title="API 状态" :value="stats.api" /></el-col>
-      <el-col :span="8"><el-statistic title="商品数" :value="stats.products" /></el-col>
-      <el-col :span="8"><el-statistic title="订单数" :value="stats.orders" /></el-col>
-    </el-row>
     <el-alert
-      style="margin-top:24px"
-      :title="isDemoModeActive() ? 'GitHub Pages 演示：完整功能请本地运行 install.ps1' : '前后端分离：mall-api + MySQL + Redis + 本管理端 + H5'"
-      type="info"
+      v-if="demo"
+      title="GitHub Pages 演示数据 · 完整功能请运行 install.ps1"
+      type="warning"
       show-icon
       :closable="false"
+      style="margin-bottom: 16px"
     />
+    <el-row v-if="stats" :gutter="16">
+      <el-col :span="6">
+        <el-card shadow="hover"><el-statistic title="商品总数" :value="stats.productCount" /></el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover"><el-statistic title="在售商品" :value="stats.onSaleCount" /></el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover"><el-statistic title="订单总数" :value="stats.orderCount" /></el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover"><el-statistic title="成交 GMV" :value="stats.totalGmv" prefix="¥" /></el-card>
+      </el-col>
+    </el-row>
+    <el-row v-if="stats" :gutter="16" style="margin-top: 16px">
+      <el-col :span="8">
+        <el-card shadow="hover"><el-statistic title="待支付" :value="stats.pendingPayCount" /></el-card>
+      </el-col>
+      <el-col :span="8">
+        <el-card shadow="hover"><el-statistic title="待发货" :value="stats.pendingShipCount" /></el-card>
+      </el-col>
+      <el-col :span="8">
+        <el-card shadow="hover"><el-statistic title="API" :value="apiStatus" /></el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>

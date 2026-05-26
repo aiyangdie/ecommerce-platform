@@ -1,10 +1,12 @@
 package com.aiyangdie.mall.controller;
 
 import com.aiyangdie.mall.common.Result;
+import com.aiyangdie.mall.dto.AdminStatsVo;
 import com.aiyangdie.mall.dto.OrderVo;
 import com.aiyangdie.mall.dto.ProductVo;
 import com.aiyangdie.mall.entity.ProductSku;
 import com.aiyangdie.mall.entity.ProductSpu;
+import com.aiyangdie.mall.service.AdminStatsService;
 import com.aiyangdie.mall.service.OrderService;
 import com.aiyangdie.mall.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +27,12 @@ public class AdminController {
 
     private final ProductService productService;
     private final OrderService orderService;
+    private final AdminStatsService adminStatsService;
+
+    @GetMapping("/stats")
+    public Result<AdminStatsVo> stats() {
+        return Result.ok(adminStatsService.stats());
+    }
 
     @GetMapping("/products")
     public Result<List<ProductVo>> products() {
@@ -56,8 +64,8 @@ public class AdminController {
     }
 
     @GetMapping("/orders")
-    public Result<List<OrderVo>> orders() {
-        return Result.ok(orderService.listAll());
+    public Result<List<OrderVo>> orders(@RequestParam(required = false) Integer status) {
+        return Result.ok(orderService.listAll(status));
     }
 
     @PostMapping("/orders/{orderNo}/ship")

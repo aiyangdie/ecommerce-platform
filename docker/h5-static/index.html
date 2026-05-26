@@ -29,13 +29,27 @@
     .bar button { flex:1; padding:12px; border:none; background:none; font-size:12px; }
     .empty { text-align:center; color:#999; padding:40px 16px; }
     .toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; padding:12px 20px; border-radius:8px; display:none; z-index:99; }
+    .search { padding:0 12px 12px; }
+    .search input { width:100%; padding:10px 12px; border:none; border-radius:8px; font-size:14px; }
+    .detail { background:#fff; margin:12px; border-radius:12px; padding:16px; display:none; }
+    .detail img { width:100%; border-radius:8px; max-height:240px; object-fit:cover; }
+    .detail h2 { margin:12px 0 8px; font-size:18px; }
+    .sku-row { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+    .sku-tag { padding:6px 12px; border:1px solid #ddd; border-radius:6px; font-size:13px; }
+    .sku-tag.on { border-color:#ff6b35; color:#ff6b35; background:#fff5f0; }
+    .back { background:none; border:none; color:#fff; font-size:14px; margin-bottom:8px; cursor:pointer; }
   </style>
 </head>
 <body>
   <div class="header">
+    <button class="back" id="btn-back" style="display:none" onclick="closeDetail()">← 返回</button>
     <h1 id="page-title">商城首页</h1>
     <p id="user-info">未登录</p>
+    <div class="search" id="search-bar">
+      <input id="keyword" placeholder="搜索商品..." oninput="searchProducts()" />
+    </div>
   </div>
+  <div id="detail-panel" class="detail"></div>
   <div id="login-panel" class="login-box" style="display:none">
     <h3>手机号登录</h3>
     <input id="mobile" placeholder="手机号" value="13800138000" />

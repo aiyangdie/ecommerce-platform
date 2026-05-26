@@ -59,9 +59,27 @@ public class OrderService {
                 .stream().map(this::toVo).collect(Collectors.toList());
     }
 
-    public List<OrderVo> listAll() {
-        return orderMapper.selectList(new LambdaQueryWrapper<MallOrder>().orderByDesc(MallOrder::getId))
-                .stream().map(this::toVo).collect(Collectors.toList());
+    public List<OrderVo> listAll(Integer status) {
+        LambdaQueryWrapper<MallOrder> q = new LambdaQueryWrapper<MallOrder>().orderByDesc(MallOrder::getId);
+        if (status != null) {
+            q.eq(MallOrder::getStatus, status);
+        }
+        return orderMapper.selectList(q).stream().map(this::toVo).collect(Collectors.toList());
+    }
+
+    public OrderVo detail(String orderNo) {
+        return toVo(getOwnedOrAdmin(orderNo));
+    }
+
+    @Transactional
+    public void cancel(String orderNo) {
+        MallOrder order = getOwnedOrAdmin(orderNo);
+        if (order.getStatus() != 10) {
+            throw BusinessException.of(30007, "仅待支付订单可取消");
+        }
+        order.setStatus(50);
+        orderMapper.updateById(order);
+        restoreStock(order.getId());
     }
 
     @Transactional
@@ -116,6 +134,18 @@ public class OrderService {
         return toVo(order);
     }
 
+    private void restoreStock(Long orderId) {
+        List<OrderItem> items = orderItemMapper.selectList(
+                new LambdaQueryWrapper<OrderItem>().eq(OrderItem::getOrderId, orderId));
+        for (OrderItem item : items) {
+            ProductSku sku = skuMapper.selectById(item.getSkuId());
+            if (sku != null) {
+                sku.setStock(sku.getStock() + item.getQuantity());
+                skuMapper.updateById(sku);
+            }
+        }
+    }
+
     private void deductStock(ProductSku sku, int qty) {
         if (sku.getStock() < qty) throw BusinessException.of(20003, "库存不足");
         sku.setStock(sku.getStock() - qty);
@@ -154,6 +184,9 @@ public class OrderService {
         vo.setReceiverName(order.getReceiverName());
         vo.setReceiverPhone(order.getReceiverPhone());
         vo.setReceiverAddr(order.getReceiverAddr());
+        if (order.getCreatedAt() != null) {
+            vo.setCreatedAt(order.getCreatedAt().toString().replace('T', ' '));
+        }
         List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>().eq(OrderItem::getOrderId, order.getId()));
         vo.setItems(items.stream().map(i -> {
             OrderItemVo iv = new OrderItemVo();
