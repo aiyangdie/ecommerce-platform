@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import http, { demoGet, isDemoMode } from '../api/http'
+import http, { demoGet, isDemoModeActive } from '../api/http'
 import { ElMessage } from 'element-plus'
 
 interface Order {
@@ -14,7 +14,7 @@ interface Order {
 const list = ref<Order[]>([])
 const loading = ref(false)
 const statusMap: Record<number, string> = { 10: '待支付', 20: '待发货', 30: '待收货', 40: '已完成', 50: '已取消' }
-const readOnly = isDemoMode || (() => localStorage.getItem('admin_token') === 'demo')()
+const readOnly = isDemoModeActive()
 
 async function load() {
   loading.value = true

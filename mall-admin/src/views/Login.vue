@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import http, { isDemoMode } from '../api/http'
+import http, { isDemoModeActive } from '../api/http'
 
 const router = useRouter()
 const form = ref({ username: 'admin', password: 'admin123' })
@@ -12,7 +12,7 @@ async function submit() {
   loading.value = true
   error.value = ''
   try {
-    if (isDemoMode) {
+    if (isDemoModeActive()) {
       if (form.value.username !== 'admin' || form.value.password !== 'admin123') {
         throw new Error('演示账号：admin / admin123')
       }
@@ -35,7 +35,7 @@ async function submit() {
   <div class="login-page">
     <el-card class="box">
       <h2>商城管理后台</h2>
-      <p v-if="isDemoMode" class="hint warn">当前为在线演示（静态页），登录后浏览演示数据</p>
+      <p v-if="isDemoModeActive()" class="hint warn">在线演示：登录后浏览静态数据，不请求后端</p>
       <p v-else class="hint">默认账号 admin / admin123 · 需 mall-api 已启动</p>
       <el-form @submit.prevent="submit">
         <el-form-item label="用户名">

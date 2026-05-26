@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import http, { demoGet, isDemoMode } from '../api/http'
+import http, { demoGet, isDemoModeActive } from '../api/http'
 import { ElMessage } from 'element-plus'
 
 interface Product {
@@ -24,7 +24,7 @@ const form = ref({
   skus: [{ skuName: '默认', price: 99, stock: 100 }],
 })
 
-const readOnly = isDemoMode || (() => localStorage.getItem('admin_token') === 'demo')()
+const readOnly = isDemoModeActive()
 
 async function load() {
   loading.value = true

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import http, { demoGet, isDemoMode } from '../api/http'
+import http, { demoGet, isDemoModeActive } from '../api/http'
 
 const stats = ref({ products: 0, orders: 0, api: '检测中' })
 
 onMounted(async () => {
-  if (isDemoMode || localStorage.getItem('admin_token') === 'demo') {
+  if (isDemoModeActive()) {
     stats.value.api = '演示模式'
     const products = await demoGet<unknown[]>('products.json')
     const orders = await demoGet<unknown[]>('orders.json')
@@ -36,7 +36,7 @@ onMounted(async () => {
     </el-row>
     <el-alert
       style="margin-top:24px"
-      :title="isDemoMode ? 'GitHub Pages 演示：完整功能请本地运行 install.ps1' : '前后端分离：mall-api + MySQL + Redis + 本管理端 + H5'"
+      :title="isDemoModeActive() ? 'GitHub Pages 演示：完整功能请本地运行 install.ps1' : '前后端分离：mall-api + MySQL + Redis + 本管理端 + H5'"
       type="info"
       show-icon
       :closable="false"

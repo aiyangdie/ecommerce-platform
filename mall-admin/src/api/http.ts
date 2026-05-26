@@ -1,7 +1,16 @@
 import axios from 'axios'
 
-/** GitHub Pages 等静态托管无法转发 POST /api，启用演示模式 */
-export const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true'
+/** 构建时或 GitHub Pages 运行时均走演示模式，避免 POST /api 导致 405 */
+export function isDemoModeActive(): boolean {
+  if (import.meta.env.VITE_DEMO_MODE === 'true') return true
+  if (typeof window !== 'undefined' && window.location.hostname.includes('github.io')) {
+    return true
+  }
+  return localStorage.getItem('admin_token') === 'demo'
+}
+
+/** @deprecated 使用 isDemoModeActive */
+export const isDemoMode = isDemoModeActive()
 
 const http = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '',
@@ -9,6 +18,9 @@ const http = axios.create({
 })
 
 http.interceptors.request.use((config) => {
+  if (isDemoModeActive()) {
+    return Promise.reject(new Error('DEMO_MODE_SKIP_API'))
+  }
   const token = localStorage.getItem('admin_token')
   if (token && token !== 'demo') {
     config.headers.Authorization = `Bearer ${token}`
@@ -25,23 +37,23 @@ http.interceptors.response.use(
     return res
   },
   (err) => {
+    if (err.message === 'DEMO_MODE_SKIP_API') {
+      return Promise.reject(err)
+    }
     const status = err.response?.status
     if (status === 405) {
       return Promise.reject(
-        new Error(
-          '接口 405：当前页面无法访问后端 API。请运行 install.ps1 启动 Docker 后访问 http://127.0.0.1:8081 ，或确认 mall-api 已启动（:8080）'
-        )
+        new Error('当前为在线演示页，请使用 admin/admin123 登录（无需后端）')
       )
     }
     if (status === 502 || status === 503) {
-      return Promise.reject(new Error('后端服务未启动，请先运行 install.ps1 或启动 mall-api'))
+      return Promise.reject(new Error('后端未启动，请运行 install.ps1'))
     }
     const msg = err.response?.data?.message || err.message || '网络错误'
     return Promise.reject(new Error(msg))
   }
 )
 
-/** 演示模式：从静态 JSON 读取 */
 export async function demoGet<T>(path: string): Promise<T> {
   const base = import.meta.env.BASE_URL
   const res = await fetch(`${base}demo/${path}`)
