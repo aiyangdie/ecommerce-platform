@@ -1,43 +1,90 @@
-# 本地开发：数据库与缓存（前后端分离，独立容器）
-# 使用: docker compose -f docker/docker-compose.yml up -d
-
 services:
   mysql:
     image: mysql:8.0
     container_name: mall-mysql
     restart: unless-stopped
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT:-3306}:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: mall_root_2026
-      MYSQL_DATABASE: mall
-      MYSQL_USER: mall
-      MYSQL_PASSWORD: mall_pass_2026
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-mall_root_2026}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mall}
+      MYSQL_USER: ${MYSQL_USER:-mall}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mall_pass_2026}
       TZ: Asia/Shanghai
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --default-authentication-plugin=mysql_native_password
     volumes:
-      - ./data/mysql:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
       - ./init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-umall", "-pmall_pass_2026"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-mall_root_2026}"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   redis:
     image: redis:7-alpine
     container_name: mall-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     command: redis-server --appendonly yes
     volumes:
-      - ./data/redis:/data
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    container_name: mall-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8080}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mall}
+      MYSQL_USER: ${MYSQL_USER:-mall}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mall_pass_2026}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-mall-open-source-jwt-secret-change-in-production}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  admin:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.admin
+    container_name: mall-admin
+    restart: unless-stopped
+    ports:
+      - "${ADMIN_PORT:-8081}:80"
+    depends_on:
+      - api
+
+  h5:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.h5
+    container_name: mall-h5
+    restart: unless-stopped
+    ports:
+      - "${H5_PORT:-8082}:80"
+    depends_on:
+      - api
+
+volumes:
+  mysql_data:
+  redis_data:

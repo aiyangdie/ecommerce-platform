@@ -5,6 +5,12 @@ const http = axios.create({
   timeout: 15000,
 })
 
+http.interceptors.request.use((config) => {
+  const token = localStorage.getItem('admin_token')
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
 http.interceptors.response.use(
   (res) => {
     const body = res.data

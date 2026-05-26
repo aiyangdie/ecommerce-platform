@@ -1,16 +1,12 @@
 package com.aiyangdie.mall.controller;
 
 import com.aiyangdie.mall.common.Result;
-import com.aiyangdie.mall.entity.ProductSpu;
-import com.aiyangdie.mall.mapper.ProductSpuMapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.aiyangdie.mall.dto.ProductVo;
+import com.aiyangdie.mall.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,24 +16,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private final ProductSpuMapper productSpuMapper;
+    private final ProductService productService;
 
-    @Operation(summary = "商品列表（上架）")
+    @Operation(summary = "上架商品列表")
     @GetMapping
-    public Result<List<ProductSpu>> list() {
-        List<ProductSpu> list = productSpuMapper.selectList(
-                new LambdaQueryWrapper<ProductSpu>().eq(ProductSpu::getStatus, 1)
-        );
-        return Result.ok(list);
+    public Result<List<ProductVo>> list() {
+        return Result.ok(productService.listOnSale());
     }
 
     @Operation(summary = "商品详情")
     @GetMapping("/{id}")
-    public Result<ProductSpu> detail(@PathVariable Long id) {
-        ProductSpu spu = productSpuMapper.selectById(id);
-        if (spu == null) {
-            return Result.fail(20001, "商品不存在");
-        }
-        return Result.ok(spu);
+    public Result<ProductVo> detail(@PathVariable Long id) {
+        return Result.ok(productService.detail(id));
     }
 }

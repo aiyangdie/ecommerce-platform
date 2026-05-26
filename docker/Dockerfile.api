@@ -1,11 +1,15 @@
 FROM maven:3.9-eclipse-temurin-17-alpine AS build
 WORKDIR /app
-COPY mall-api/pom.xml mall-api/pom.xml
-COPY mall-api/src mall-api/src
-RUN mvn -f mall-api/pom.xml -DskipTests package -q
+COPY mall-api/pom.xml ./pom.xml
+RUN mvn -q dependency:go-offline -f pom.xml || true
+COPY mall-api/src ./src
+RUN mvn -q -DskipTests package -f pom.xml
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=build /app/mall-api/target/*.jar app.jar
+RUN apk add --no-cache curl
+COPY --from=build /app/target/mall-api-*.jar app.jar
 EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD curl -f http://localhost:8080/api/health || exit 1
 ENTRYPOINT ["java", "-jar", "app.jar"]

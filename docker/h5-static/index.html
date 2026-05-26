@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>商城 · H5</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f5f5f5; color: #222; padding-bottom: 64px; }
+    .header { background: linear-gradient(135deg,#ff6b35,#f7931e); color:#fff; padding:20px 16px; }
+    .header h1 { font-size: 20px; }
+    .header p { font-size: 13px; opacity: .9; margin-top: 4px; }
+    .tabs { display:flex; background:#fff; border-bottom:1px solid #eee; }
+    .tabs button { flex:1; padding:12px; border:none; background:none; font-size:14px; }
+    .tabs button.active { color:#ff6b35; border-bottom:2px solid #ff6b35; font-weight:600; }
+    .panel { display:none; padding:12px; }
+    .panel.active { display:block; }
+    .card { background:#fff; border-radius:10px; padding:12px; margin-bottom:10px; display:flex; gap:12px; }
+    .card img { width:80px; height:80px; border-radius:8px; object-fit:cover; background:#eee; }
+    .card h3 { font-size:15px; margin-bottom:4px; }
+    .card .price { color:#ff6b35; font-weight:700; font-size:16px; }
+    .card .sub { font-size:12px; color:#888; margin:4px 0; }
+    .btn { background:#ff6b35; color:#fff; border:none; padding:8px 14px; border-radius:6px; font-size:13px; }
+    .btn-sm { padding:6px 10px; font-size:12px; }
+    .btn-outline { background:#fff; color:#ff6b35; border:1px solid #ff6b35; }
+    .login-box { background:#fff; border-radius:12px; padding:20px; margin:16px; }
+    .login-box input { width:100%; padding:12px; margin:8px 0; border:1px solid #ddd; border-radius:8px; }
+    .bar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #eee; display:flex; }
+    .bar button { flex:1; padding:12px; border:none; background:none; font-size:12px; }
+    .empty { text-align:center; color:#999; padding:40px 16px; }
+    .toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; padding:12px 20px; border-radius:8px; display:none; z-index:99; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 id="page-title">商城首页</h1>
+    <p id="user-info">未登录</p>
+  </div>
+  <div id="login-panel" class="login-box" style="display:none">
+    <h3>手机号登录</h3>
+    <input id="mobile" placeholder="手机号" value="13800138000" />
+    <input id="code" placeholder="验证码" value="123456" />
+    <button class="btn" style="width:100%;margin-top:8px" onclick="doLogin()">登录</button>
+    <p style="font-size:12px;color:#999;margin-top:8px">演示验证码固定：123456</p>
+  </div>
+  <div id="shop-panel">
+    <div id="products"></div>
+  </div>
+  <div id="cart-panel" style="display:none"><div id="cart-list"></div></div>
+  <div id="order-panel" style="display:none"><div id="order-list"></div></div>
+  <div class="bar">
+    <button onclick="showTab('shop')">首页</button>
+    <button onclick="showTab('cart')">购物车</button>
+    <button onclick="showTab('order')">订单</button>
+    <button onclick="showTab('login')">我的</button>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

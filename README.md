@@ -1,97 +1,87 @@
 # ecommerce-platform
 
 [![CI](https://github.com/aiyangdie/ecommerce-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/aiyangdie/ecommerce-platform/actions/workflows/ci.yml)
-[![Pages](https://github.com/aiyangdie/ecommerce-platform/actions/workflows/deploy-admin.yml/badge.svg)](https://github.com/aiyangdie/ecommerce-platform/actions/workflows/deploy-admin.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> 前后端分离 · 数据库独立 · 开源成熟框架 · 支持 H5 / 微信小程序 / 微信公众号 / App
+> **开源可部署 · 前后端分离 · 一键安装 · 完整购物流程**
 
-高品质电商平台技术底座，用于展示完整的电商系统架构与工程化能力（Spring Boot 3、Vue 3、uni-app、MySQL、Redis）。
+Spring Boot 3 + Vue 3 + MySQL + Redis + Docker，支持 H5 商城、管理后台、uni-app 四端扩展。
 
-## 架构一览
-
-```
-┌─────────────┐  ┌─────────────┐  ┌──────────────────────────────┐
-│  mall-uni   │  │ mall-admin  │  │         mall-api             │
-│  uni-app    │  │ Vue3+Vite   │  │ Spring Boot 3 + MyBatis-Plus │
-│  C端四端    │  │ 管理后台     │  │         REST API             │
-└──────┬──────┘  └──────┬──────┘  └──────────────┬───────────────┘
-       │                │                        │
-       └────────────────┴────────────────────────┘
-                                │
-                    ┌───────────┴───────────┐
-                    │  MySQL 8   Redis 7    │
-                    │  (Docker 独立容器)     │
-                    └───────────────────────┘
-```
-
-| 目录 | 技术栈 | 说明 |
-|------|--------|------|
-| [`mall-api/`](mall-api/) | Spring Boot 3、MyBatis-Plus、Knife4j | 后端 API，端口 `8080` |
-| [`mall-admin/`](mall-admin/) | Vue 3、Element Plus、Vite | 运营管理后台 |
-| [`mall-uni/`](mall-uni/) | uni-app、Vue 3 | H5 / 小程序 / 公众号 / App |
-| [`docker/`](docker/) | Docker Compose | MySQL + Redis，与前后端分离部署 |
-| [`docs/`](docs/) | 设计文档、搭建与部署指南 | |
-
-## 快速开始
-
-### 1. 启动数据库（Docker）
-
-```bash
-docker compose -f docker/docker-compose.yml up -d
-```
-
-### 2. 启动后端
-
-```bash
-cd mall-api
-mvn spring-boot:run
-```
-
-接口文档：http://127.0.0.1:8080/doc.html
-
-### 3. 启动管理端
-
-```bash
-cd mall-admin
-npm install
-npm run dev
-```
-
-访问：http://127.0.0.1:5173
-
-### 4. C 端（uni-app）
-
-使用 HBuilderX 打开 `mall-uni/`，详见 [mall-uni/README.md](mall-uni/README.md)。
-
-更完整步骤见 **[docs/SETUP.md](docs/SETUP.md)**。
-
-## 在线演示（GitHub Pages）
+## 在线演示
 
 | 页面 | 地址 |
 |------|------|
-| **门户首页** | https://aiyangdie.github.io/ecommerce-platform/ |
-| **管理后台演示** | https://aiyangdie.github.io/ecommerce-platform/admin/ |
+| 项目门户 | https://aiyangdie.github.io/ecommerce-platform/ |
+| 管理端静态演示 | https://aiyangdie.github.io/ecommerce-platform/admin/ |
 
-首次启用请在仓库 **Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**，然后到 **Actions** 运行 **Deploy Online (GitHub Pages)**（推送 `main` 会自动触发）。
+**完整功能**请本地/Docker 一键安装（见下方）。
 
-| 组件 | 部署方式 |
-|------|----------|
-| **门户 + 管理端** | GitHub Actions → Pages（含在线演示数据） |
-| **后端 API** | 云主机 / Railway / Render（见 [docs/DEPLOY.md](docs/DEPLOY.md)） |
-| **MySQL / Redis** | Docker 或云数据库 |
+## 一键安装
 
-> 私有仓库需 GitHub Pro 才能用 Pages；**建议改为 Public** 以便他人访问在线演示。
+```powershell
+# Windows（需 Docker Desktop）
+.\install.ps1
+```
+
+```bash
+# Linux / macOS
+chmod +x install.sh && ./install.sh
+```
+
+| 服务 | 地址 |
+|------|------|
+| H5 商城 | http://127.0.0.1:8082 |
+| 管理后台 | http://127.0.0.1:8081 |
+| API | http://127.0.0.1:8080 |
+| 文档 | http://127.0.0.1:8080/doc.html |
+
+- 管理员：`admin` / `admin123`
+- 用户：手机号 + 验证码 `123456`
+
+详细说明：[docs/INSTALL.md](docs/INSTALL.md)
+
+## 功能清单
+
+- [x] 用户手机号登录（演示验证码）
+- [x] 商品浏览、SKU、库存
+- [x] 购物车、下单、模拟支付
+- [x] 订单状态流转（待支付→待发货→待收货→完成）
+- [x] 管理端：商品 CRUD、上下架、发货
+- [x] Docker 分离部署：MySQL / Redis / API / Admin / H5
+- [x] 一键安装脚本 `install.ps1` / `install.sh`
+- [ ] 微信/支付宝真实支付（可扩展）
+- [ ] uni-app 小程序/App 打包（见 mall-uni）
+
+## 项目结构
+
+```
+├── mall-api/       # 后端 Spring Boot 3 + MyBatis-Plus
+├── mall-admin/     # 管理端 Vue 3 + Element Plus
+├── mall-uni/       # C端 uni-app（H5/小程序/App）
+├── docker/         # Docker Compose + Dockerfile
+├── install.ps1     # Windows 一键安装
+├── install.sh      # Linux/macOS 一键安装
+└── docs/           # 设计文档与安装指南
+```
+
+## 架构
+
+```
+H5(:8082) ──┐
+Admin(:8081)├──► API(:8080) ──► MySQL + Redis
+uni-app     ──┘
+```
 
 ## 文档
 
-- [电商平台开发文档](docs/电商平台开发文档.md) — 业务域、高并发、技术选型
-- [本地搭建指南](docs/SETUP.md)
-- [部署与 GitHub CI/CD](docs/DEPLOY.md)
+- [安装指南](docs/INSTALL.md)
+- [本地开发](docs/SETUP.md)
+- [部署与 CI/CD](docs/DEPLOY.md)
+- [电商设计文档](docs/电商平台开发文档.md)
+- [搭建规划](docs/搭建规划.md)
 
-## 许可证
+## 开源协议
 
-本项目为演示与学习用途的自有实现；商用请自行完善支付、合规与风控模块。
-
----
+[MIT](LICENSE) — 可自由使用、修改与商用（支付与合规模块请自行完善）。
 
 **作者**：[@aiyangdie](https://github.com/aiyangdie)
